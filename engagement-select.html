@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เลือกกิจกรรม Engagement เพิ่มเติม | Thailand Talent Summit 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B2545;
+    --navy-deep:#08192F;
+    --navy-mid:#13355E;
+    --gold:#C9A227;
+    --gold-light:#E8C766;
+    --bg:#F4F6F9;
+    --card:#FFFFFF;
+    --text:#1C2B3A;
+    --muted:#6B7A8D;
+    --border:#E2E7EE;
+    --ok:#1F8A5C;
+    --ok-bg:#E8F6EF;
+    --warn:#B5590A;
+    --warn-bg:#FDF1E3;
+    --danger:#C0392B;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Sarabun','Noto Sans Thai',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.6;
+  }
+  header.top{
+    background:linear-gradient(120deg,var(--navy-deep) 0%,var(--navy) 55%,var(--navy-mid) 100%);
+    color:#fff;
+    padding:28px 20px 34px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+  }
+  header.top::after{
+    content:"";
+    position:absolute;
+    bottom:0;left:0;right:0;
+    height:4px;
+    background:linear-gradient(90deg,var(--gold-light),var(--gold),var(--gold-light));
+  }
+  header.top .eyebrow{
+    font-size:13px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--gold-light);
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  header.top h1{
+    margin:0;
+    font-size:26px;
+    font-weight:700;
+  }
+  header.top p{
+    margin:8px 0 0;
+    font-size:15px;
+    color:#CBD6E4;
+  }
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:22px 16px 60px;
+  }
+  .demo-banner{
+    background:var(--warn-bg);
+    border:1px solid #F0D2A6;
+    color:var(--warn);
+    border-radius:10px;
+    padding:12px 16px;
+    font-size:13.5px;
+    margin-bottom:20px;
+  }
+  .demo-banner b{color:#8A4407;}
+  .steps{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:22px;
+    gap:6px;
+  }
+  .step{
+    flex:1;
+    text-align:center;
+    font-size:12.5px;
+    color:var(--muted);
+    padding-bottom:10px;
+    border-bottom:3px solid var(--border);
+    font-weight:600;
+    transition:all .2s;
+  }
+  .step.active{color:var(--navy);border-color:var(--gold);}
+  .step.done{color:var(--ok);border-color:var(--ok);}
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    border:1px solid var(--border);
+    padding:24px 22px;
+    margin-bottom:18px;
+    box-shadow:0 1px 3px rgba(11,37,69,.04);
+  }
+  .card h2{
+    margin:0 0 4px;
+    font-size:19px;
+    color:var(--navy);
+  }
+  .card .sub{
+    color:var(--muted);
+    font-size:13.5px;
+    margin-bottom:18px;
+  }
+  .search-wrap{position:relative;margin-bottom:16px;}
+  .search-dropdown{
+    position:absolute;
+    top:calc(100% + 4px);
+    left:0;right:0;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:9px;
+    box-shadow:0 10px 28px rgba(11,37,69,.14);
+    max-height:280px;
+    overflow-y:auto;
+    z-index:20;
+    display:none;
+  }
+  .search-dropdown.show{display:block;}
+  .search-item{
+    padding:10px 14px;
+    cursor:pointer;
+    border-top:1px solid var(--border);
+  }
+  .search-item:first-child{border-top:none;}
+  .search-item:hover,.search-item.active{background:var(--bg);}
+  .search-item .si-name{font-weight:600;font-size:14px;color:var(--text);}
+  .search-item .si-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+  .search-item mark{background:#FCEEB5;color:inherit;border-radius:2px;padding:0 1px;}
+  .search-dropdown .no-results{padding:12px 14px;color:var(--muted);font-size:13px;}
+  .selected-user{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:var(--ok-bg);
+    border:1px solid #BFE5D2;
+    border-radius:9px;
+    padding:11px 14px;
+    margin-bottom:16px;
+  }
+  .selected-user .su-name{font-weight:700;color:#155C3E;font-size:14.5px;}
+  .selected-user .su-meta{font-size:12.5px;color:#2E7355;margin-top:2px;}
+  .su-clear{
+    flex-shrink:0;
+    background:transparent;
+    border:1px solid #BFE5D2;
+    color:#155C3E;
+    padding:7px 13px;
+    border-radius:7px;
+    font-size:12.5px;
+    font-weight:600;
+    font-family:inherit;
+    cursor:pointer;
+  }
+  .su-clear:hover{background:#fff;}
+  label.field-label{
+    display:block;
+    font-size:13.5px;
+    font-weight:600;
+    color:var(--navy);
+    margin:0 0 6px;
+  }
+  input[type=text],input[type=email]{
+    width:100%;
+    padding:11px 13px;
+    border:1.5px solid var(--border);
+    border-radius:9px;
+    font-family:inherit;
+    font-size:14.5px;
+    margin-bottom:16px;
+    background:#FBFCFE;
+    transition:border-color .15s;
+  }
+  input[type=text]:focus,input[type=email]:focus{
+    outline:none;
+    border-color:var(--navy-mid);
+    background:#fff;
+  }
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:12px 22px;
+    border-radius:9px;
+    border:none;
+    font-family:inherit;
+    font-size:14.5px;
+    font-weight:600;
+    cursor:pointer;
+    transition:all .15s;
+  }
+  .btn-primary{background:var(--navy);color:#fff;}
+  .btn-primary:hover{background:var(--navy-mid);}
+  .btn-primary:disabled{background:#AEB9C6;cursor:not-allowed;}
+  .btn-ghost{background:transparent;color:var(--navy);border:1.5px solid var(--border);}
+  .btn-ghost:hover{border-color:var(--navy);}
+  .btn-block{width:100%;}
+  .row-btns{display:flex;gap:10px;margin-top:6px;}
+  .error-msg{
+    background:#FDECEA;
+    color:var(--danger);
+    border:1px solid #F3C4BE;
+    border-radius:9px;
+    padding:10px 14px;
+    font-size:13.5px;
+    margin-bottom:16px;
+    display:none;
+  }
+  .welcome-box{
+    background:var(--ok-bg);
+    border:1px solid #BFE5D2;
+    border-radius:10px;
+    padding:12px 16px;
+    margin-bottom:18px;
+    font-size:14px;
+    color:#155C3E;
+  }
+  .welcome-box b{color:var(--ok);}
+  details.demo-data{
+    margin-top:14px;
+    font-size:12.5px;
+    color:var(--muted);
+  }
+  details.demo-data summary{cursor:pointer;font-weight:600;color:var(--navy-mid);}
+  details.demo-data table{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px;}
+  details.demo-data td,details.demo-data th{border:1px solid var(--border);padding:6px 8px;text-align:left;}
+
+  .day-block{margin-bottom:24px;}
+  .day-title{
+    font-size:15px;
+    font-weight:700;
+    color:var(--navy);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-bottom:12px;
+    padding-bottom:8px;
+    border-bottom:2px solid var(--bg);
+  }
+  .day-title .badge{
+    background:var(--navy);
+    color:#fff;
+    font-size:11px;
+    padding:3px 9px;
+    border-radius:20px;
+    font-weight:600;
+  }
+  .slot-group{
+    margin-bottom:16px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .slot-head{
+    background:var(--bg);
+    padding:9px 14px;
+    font-size:12.5px;
+    font-weight:600;
+    color:var(--navy-mid);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .slot-head .time{color:var(--muted);font-weight:500;}
+  .activity{
+    padding:13px 14px;
+    border-top:1px solid var(--border);
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    cursor:pointer;
+    transition:background .12s;
+  }
+  .activity:first-of-type{border-top:none;}
+  .activity:hover{background:#FAFBFD;}
+  .activity input{margin-top:3px;flex-shrink:0;width:17px;height:17px;accent-color:var(--navy);}
+  .activity .a-title{font-weight:600;font-size:14.5px;color:var(--text);}
+  .activity .a-type{
+    display:inline-block;
+    font-size:10.5px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    color:var(--navy-mid);
+    background:#E7ECF3;
+    padding:2px 8px;
+    border-radius:20px;
+    margin-bottom:4px;
+  }
+  .activity .a-sub{font-size:13px;color:var(--muted);margin-top:3px;}
+  .activity.disabled{opacity:.45;cursor:not-allowed;background:#F7F8FA;}
+  .conflict-note{
+    display:none;
+    background:var(--warn-bg);
+    color:var(--warn);
+    font-size:12px;
+    padding:8px 14px;
+    border-top:1px solid #F0D2A6;
+  }
+  .conflict-note.show{display:block;}
+
+  .summary-list{list-style:none;margin:0;padding:0;}
+  .summary-list li{
+    padding:12px 14px;
+    border:1px solid var(--border);
+    border-radius:9px;
+    margin-bottom:10px;
+    font-size:14px;
+  }
+  .summary-list li .s-day{font-size:12px;color:var(--muted);margin-bottom:2px;}
+  .summary-list li .s-title{font-weight:600;color:var(--navy);}
+  .empty-note{color:var(--muted);font-size:13.5px;font-style:italic;}
+
+  .confirm-icon{
+    width:56px;height:56px;border-radius:50%;
+    background:var(--ok-bg);color:var(--ok);
+    display:flex;align-items:center;justify-content:center;
+    font-size:28px;margin:0 auto 14px;
+  }
+  .center{text-align:center;}
+  footer{text-align:center;color:var(--muted);font-size:12px;padding:20px 16px 40px;}
+  @media(max-width:480px){
+    header.top h1{font-size:21px;}
+    .card{padding:18px 16px;}
+    .step{font-size:11px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="eyebrow">สำนักงานคณะกรรมการส่งเสริมวิทยาศาสตร์ วิจัยและนวัตกรรม (สกสว.)</div>
+  <h1>Thailand Talent Summit 2026</h1>
+  <p>การประชุมบุคลากรไทยที่มีความสามารถระดับสูง ประจำปี พ.ศ. 2569 · เลือกกิจกรรม Engagement เพิ่มเติม</p>
+</header>
+
+<div class="wrap">
+
+  <div class="demo-banner">
+    <b>โหมดสาธิต (Demo):</b> หน้านี้ยังไม่เชื่อมต่อฐานข้อมูลผู้ลงทะเบียนจริง ระบบค้นหาตัวตนใช้ข้อมูลตัวอย่างสำหรับทดสอบเท่านั้น การเลือกกิจกรรมจะถูกบันทึกไว้ในเบราว์เซอร์นี้เท่านั้น (localStorage) ยังไม่ถูกส่งเข้าระบบส่วนกลาง
+  </div>
+
+  <div class="steps">
+    <div class="step active" id="step-ind-1">1. ยืนยันตัวตน</div>
+    <div class="step" id="step-ind-2">2. เลือกกิจกรรม</div>
+    <div class="step" id="step-ind-3">3. ยืนยันการเลือก</div>
+  </div>
+
+  <!-- STEP 1: IDENTITY -->
+  <section id="step1" class="card">
+    <h2>ยืนยันตัวตนผู้ลงทะเบียน</h2>
+    <div class="sub">กรุณายืนยันตัวตนด้วยข้อมูลที่ใช้ลงทะเบียนไว้ เพื่อเลือกกิจกรรม Engagement เพิ่มเติม</div>
+
+    <div class="error-msg" id="err1">กรุณาเลือกชื่อจากรายการค้นหาก่อนกดยืนยันตัวตน</div>
+
+    <label class="field-label">ค้นหาชื่อ-นามสกุล, อีเมล, หน่วยงาน หรือรหัสลงทะเบียน</label>
+    <div class="search-wrap">
+      <input type="text" id="in-search" placeholder="พิมพ์บางส่วน เช่น สมชาย, มหิดล หรือ TTS26-0001" autocomplete="off">
+      <div class="search-dropdown" id="search-dropdown"></div>
+    </div>
+
+    <div class="selected-user" id="selected-user" style="display:none;">
+      <div>
+        <div class="su-name" id="su-name"></div>
+        <div class="su-meta" id="su-meta"></div>
+      </div>
+      <button class="su-clear" type="button" id="su-clear">เปลี่ยน</button>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="btn-verify" disabled>ยืนยันตัวตน</button>
+
+    <details class="demo-data">
+      <summary>ข้อมูลตัวอย่างสำหรับทดสอบระบบ (Demo)</summary>
+      <table>
+        <tr><th>ชื่อ-นามสกุล</th><th>อีเมล</th><th>หน่วยงาน</th><th>รหัสลงทะเบียน</th></tr>
+        <tr><td>สมชาย ใจดี</td><td>somchai.j@example.ac.th</td><td>จุฬาลงกรณ์มหาวิทยาลัย</td><td>TTS26-0001</td></tr>
+        <tr><td>วิภาวี ศรีสุข</td><td>wipawee.s@nstda.or.th</td><td>สวทช.</td><td>TTS26-0002</td></tr>
+        <tr><td>ธนกร รุ่งเรือง</td><td>thanakorn.r@ku.ac.th</td><td>มหาวิทยาลัยเกษตรศาสตร์</td><td>TTS26-0003</td></tr>
+        <tr><td>ปิยะดา แสงทอง</td><td>piyada.s@mahidol.ac.th</td><td>มหาวิทยาลัยมหิดล</td><td>TTS26-0004</td></tr>
+        <tr><td>อรรถพล เจริญสุข</td><td>attapol.c@tsri.or.th</td><td>สกสว.</td><td>TTS26-0005</td></tr>
+      </table>
+    </details>
+  </section>
+
+  <!-- STEP 2: SELECT ACTIVITIES -->
+  <section id="step2" class="card" style="display:none;">
+    <div class="welcome-box" id="welcome-box"></div>
+    <h2>เลือกกิจกรรม Engagement เพิ่มเติม</h2>
+    <div class="sub">เลือกได้ 1 กิจกรรมต่อช่วงเวลาที่จัดพร้อมกัน ระบบจะแจ้งเตือนหากกิจกรรมที่เลือกมีเวลาซ้อนทับกัน</div>
+
+    <div id="activity-list"></div>
+
+    <div class="row-btns">
+      <button class="btn btn-ghost" id="btn-back-1">ย้อนกลับ</button>
+      <button class="btn btn-primary btn-block" id="btn-to-review">ตรวจสอบและยืนยันการเลือก</button>
+    </div>
+  </section>
+
+  <!-- STEP 3: REVIEW -->
+  <section id="step3" class="card" style="display:none;">
+    <h2>ตรวจสอบรายการที่เลือก</h2>
+    <div class="sub">กรุณาตรวจสอบความถูกต้องก่อนยืนยันการเลือกกิจกรรม</div>
+    <ul class="summary-list" id="summary-list"></ul>
+    <div class="row-btns">
+      <button class="btn btn-ghost" id="btn-back-2">แก้ไขการเลือก</button>
+      <button class="btn btn-primary btn-block" id="btn-submit">ยืนยันการเลือกกิจกรรม</button>
+    </div>
+  </section>
+
+  <!-- STEP 4: DONE -->
+  <section id="step4" class="card" style="display:none;">
+    <div class="confirm-icon">✓</div>
+    <h2 class="center">บันทึกการเลือกกิจกรรมเรียบร้อย</h2>
+    <p class="center sub" id="done-name"></p>
+    <ul class="summary-list" id="done-list"></ul>
+    <div class="row-btns">
+      <button class="btn btn-ghost btn-block" id="btn-edit-again">แก้ไขการเลือกอีกครั้ง</button>
+      <button class="btn btn-primary btn-block" id="btn-print">พิมพ์ / บันทึกเป็น PDF</button>
+    </div>
+  </section>
+
+</div>
+
+<footer>Thailand Talent Summit 2026 · จัดโดย สกสว. — หน้านี้เป็นไฟล์สาธิต (demo) ยังไม่เชื่อมต่อระบบฐานข้อมูลจริง</footer>
+
+<script>
+// ---------- Mock registrant database ----------
+const REGISTRANTS = [
+  {name:"สมชาย ใจดี", email:"somchai.j@example.ac.th", org:"จุฬาลงกรณ์มหาวิทยาลัย", code:"TTS26-0001"},
+  {name:"วิภาวี ศรีสุข", email:"wipawee.s@nstda.or.th", org:"สวทช.", code:"TTS26-0002"},
+  {name:"ธนกร รุ่งเรือง", email:"thanakorn.r@ku.ac.th", org:"มหาวิทยาลัยเกษตรศาสตร์", code:"TTS26-0003"},
+  {name:"ปิยะดา แสงทอง", email:"piyada.s@mahidol.ac.th", org:"มหาวิทยาลัยมหิดล", code:"TTS26-0004"},
+  {name:"อรรถพล เจริญสุข", email:"attapol.c@tsri.or.th", org:"สกสว.", code:"TTS26-0005"}
+];
+
+// ---------- Activity schedule ----------
+// slot = exact concurrent time block; fullDayConflict = slots it overlaps with (for PO Networking spanning the whole day)
+const SCHEDULE = [
+  {
+    day: "23 กันยายน 2569",
+    slots: [
+      {
+        slotId:"d1-1630", time:"16.30–18.00 น.", mode:"radio",
+        items:[
+          {id:"a1", type:"Strategic Forum", title:"Future-Ready Diagnostics: Empowering Talent for National Health Impact", sub:"การเตรียมความพร้อมด้านชุดตรวจแห่งอนาคต: การเสริมสร้างศักยภาพนักวิจัยเพื่อสร้างผลกระทบต่อสุขภาพระดับชาติ"},
+          {id:"a2", type:"Strategic Forum", title:"Quantum Future Forum", sub:"ร่วมกำหนด White Paper ด้านเทคโนโลยีควอนตัมของประเทศไทย"},
+          {id:"a3", type:"Strategic Forum", title:"Open Science for Sustainable Community", sub:"นิเวศทางปัญญา และวิทยาศาสตร์แบบเปิดเพื่อการพัฒนาชุมชนอย่างยั่งยืน"}
+        ]
+      }
+    ]
+  },
+  {
+    day: "24 กันยายน 2569",
+    slots: [
+      {
+        slotId:"d2-fullday", time:"10.00–16.00 น. (ตลอดวัน)", mode:"checkbox",
+        conflictsWith:["d2-1000","d2-1330"],
+        conflictMsg:"กิจกรรมนี้จัดตลอดวัน หากเลือกจะไม่สามารถเข้าร่วมกิจกรรมช่วง 10.00–12.00 น. และ 13.30–15.30 น. ของวันเดียวกันได้",
+        items:[
+          {id:"a4", type:"PO Networking", title:"เวทีสร้างเครือข่าย PO เพื่อขับเคลื่อนการบริหารจัดการ ววน."}
+        ]
+      },
+      {
+        slotId:"d2-1000", time:"10.00–12.00 น.", mode:"checkbox",
+        conflictsWith:["d2-fullday"],
+        conflictMsg:"ช่วงเวลานี้ซ้อนทับกับ PO Networking (ตลอดวัน) หากเลือกกิจกรรมนี้ ระบบจะยกเลิกการเลือก PO Networking ให้อัตโนมัติ",
+        items:[
+          {id:"a5", type:"Masterclass", title:"AI-Powered Research", sub:"AI เพื่อการทำวิจัยอย่างมีประสิทธิภาพ"}
+        ]
+      },
+      {
+        slotId:"d2-1330", time:"13.30–15.30 น.", mode:"radio",
+        conflictsWith:["d2-fullday"],
+        conflictMsg:"ช่วงเวลานี้ซ้อนทับกับ PO Networking (ตลอดวัน) หากเลือกกิจกรรมนี้ ระบบจะยกเลิกการเลือก PO Networking ให้อัตโนมัติ",
+        items:[
+          {id:"a6", type:"Masterclass", title:"Research to Impact", sub:"ต่อยอดงานวิจัยสู่การใช้ประโยชน์ด้วย IP และ TRIUP Act"},
+          {id:"a7", type:"Strategic Forum", title:"National Resilience Forum", sub:"ความมั่นคงของประเทศด้านสุขภาพ อาหาร และเทคโนโลยีแห่งอนาคต"}
+        ]
+      },
+      {
+        slotId:"d2-1600", time:"16.00–18.00 น.", mode:"checkbox",
+        items:[
+          {id:"a8", type:"Activity", title:"กิจกรรม Beach Connect"}
+        ]
+      }
+    ]
+  }
+];
+
+// flat lookup id -> item/slot/day meta
+const ITEM_INDEX = {};
+SCHEDULE.forEach(d=>d.slots.forEach(s=>s.items.forEach(it=>{
+  ITEM_INDEX[it.id] = {...it, slotId:s.slotId, time:s.time, day:d.day, mode:s.mode};
+})));
+
+let currentUser = null;
+let selections = new Set(); // item ids
+let selectedCandidate = null;
+
+// ---------- Live search / autocomplete ----------
+const searchInput = document.getElementById('in-search');
+const dropdown = document.getElementById('search-dropdown');
+
+function norm(s){ return (s||'').toLowerCase().trim(); }
+
+function escapeHtml(s){
+  return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function highlight(text, q){
+  const safe = escapeHtml(text);
+  if(!q) return safe;
+  const idx = norm(text).indexOf(norm(q));
+  if(idx === -1) return safe;
+  const safeQ = escapeHtml(text.slice(idx, idx+q.length));
+  return escapeHtml(text.slice(0,idx)) + '<mark>' + safeQ + '</mark>' + escapeHtml(text.slice(idx+q.length));
+}
+
+function searchRegistrants(q){
+  const nq = norm(q);
+  if(!nq) return [];
+  return REGISTRANTS.filter(r =>
+    norm(r.name).includes(nq) ||
+    norm(r.email).includes(nq) ||
+    norm(r.org).includes(nq) ||
+    norm(r.code).includes(nq)
+  ).slice(0, 8);
+}
+
+function renderDropdown(q){
+  if(!q.trim()){
+    dropdown.classList.remove('show');
+    dropdown.innerHTML = '';
+    return;
+  }
+  const results = searchRegistrants(q);
+  if(results.length === 0){
+    dropdown.innerHTML = `<div class="no-results">ไม่พบข้อมูลที่ตรงกับ "${escapeHtml(q)}"</div>`;
+    dropdown.classList.add('show');
+    return;
+  }
+  dropdown.innerHTML = results.map(r => `
+    <div class="search-item" data-code="${r.code}">
+      <div class="si-name">${highlight(r.name, q)}</div>
+      <div class="si-meta">${highlight(r.org, q)} · ${highlight(r.email, q)} · รหัส ${highlight(r.code, q)}</div>
+    </div>`).join('');
+  dropdown.classList.add('show');
+  dropdown.querySelectorAll('.search-item').forEach(el=>{
+    el.addEventListener('click', ()=> selectCandidate(el.dataset.code));
+  });
+}
+
+function selectCandidate(code){
+  const r = REGISTRANTS.find(x => x.code === code);
+  if(!r) return;
+  selectedCandidate = r;
+  searchInput.value = '';
+  dropdown.classList.remove('show');
+  dropdown.innerHTML = '';
+  document.getElementById('selected-user').style.display = 'flex';
+  document.getElementById('su-name').textContent = r.name;
+  document.getElementById('su-meta').textContent = `${r.org} · รหัสลงทะเบียน ${r.code}`;
+  document.getElementById('btn-verify').disabled = false;
+  document.getElementById('err1').style.display = 'none';
+}
+
+searchInput.addEventListener('input', (e)=> renderDropdown(e.target.value));
+searchInput.addEventListener('focus', (e)=>{ if(e.target.value.trim()) renderDropdown(e.target.value); });
+searchInput.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter'){
+    e.preventDefault();
+    const results = searchRegistrants(searchInput.value);
+    if(results.length >= 1) selectCandidate(results[0].code);
+  } else if(e.key === 'Escape'){
+    dropdown.classList.remove('show');
+  }
+});
+document.addEventListener('click', (e)=>{
+  if(!e.target.closest('.search-wrap')) dropdown.classList.remove('show');
+});
+document.getElementById('su-clear').addEventListener('click', ()=>{
+  selectedCandidate = null;
+  document.getElementById('selected-user').style.display = 'none';
+  document.getElementById('btn-verify').disabled = true;
+  searchInput.value = '';
+  searchInput.focus();
+});
+
+// ---------- Step navigation helper ----------
+function goStep(n){
+  [1,2,3,4].forEach(i=>{
+    const el = document.getElementById('step'+i);
+    if(el) el.style.display = (i===n)?'block':'none';
+  });
+  ['step-ind-1','step-ind-2','step-ind-3'].forEach((id,idx)=>{
+    const el = document.getElementById(id);
+    el.classList.remove('active','done');
+    if(idx+1 < n) el.classList.add('done');
+    else if(idx+1 === n) el.classList.add('active');
+  });
+}
+
+// ---------- Verify identity ----------
+document.getElementById('btn-verify').addEventListener('click', ()=>{
+  if(!selectedCandidate){
+    document.getElementById('err1').style.display='block';
+    return;
+  }
+  document.getElementById('err1').style.display='none';
+  currentUser = selectedCandidate;
+
+  // load any saved selections for this user
+  const saved = localStorage.getItem('engagement_'+currentUser.code);
+  selections = new Set(saved ? JSON.parse(saved) : []);
+
+  document.getElementById('welcome-box').innerHTML =
+    `ยืนยันตัวตนสำเร็จ ยินดีต้อนรับคุณ <b>${currentUser.name}</b> (${currentUser.org})`;
+
+  renderActivities();
+  goStep(2);
+});
+
+// ---------- Render activity list ----------
+function renderActivities(){
+  const wrap = document.getElementById('activity-list');
+  wrap.innerHTML = '';
+  SCHEDULE.forEach(day=>{
+    const dayBlock = document.createElement('div');
+    dayBlock.className = 'day-block';
+    dayBlock.innerHTML = `<div class="day-title"><span class="badge">${day.day}</span></div>`;
+
+    day.slots.forEach(slot=>{
+      const groupEl = document.createElement('div');
+      groupEl.className = 'slot-group';
+      groupEl.dataset.slotId = slot.slotId;
+
+      const head = document.createElement('div');
+      head.className = 'slot-head';
+      head.innerHTML = `<span>${slot.mode==='radio' ? 'เลือกได้ 1 กิจกรรม' : 'กิจกรรม'}</span><span class="time">${slot.time}</span>`;
+      groupEl.appendChild(head);
+
+      slot.items.forEach(item=>{
+        const row = document.createElement('label');
+        row.className = 'activity';
+        row.dataset.itemId = item.id;
+        const inputType = slot.mode === 'radio' ? 'radio' : 'checkbox';
+        const inputName = slot.mode === 'radio' ? slot.slotId : item.id;
+        row.innerHTML = `
+          <input type="${inputType}" name="${inputName}" value="${item.id}" ${selections.has(item.id)?'checked':''}>
+          <div>
+            <span class="a-type">${item.type}</span><br>
+            <span class="a-title">${item.title}</span>
+            ${item.sub ? `<div class="a-sub">${item.sub}</div>` : ''}
+          </div>`;
+        row.querySelector('input').addEventListener('change', (e)=> onToggle(item.id, slot, e.target.checked));
+        groupEl.appendChild(row);
+      });
+
+      if(slot.conflictMsg){
+        const note = document.createElement('div');
+        note.className = 'conflict-note';
+        note.id = 'note-'+slot.slotId;
+        note.textContent = slot.conflictMsg;
+        groupEl.appendChild(note);
+      }
+
+      dayBlock.appendChild(groupEl);
+    });
+    wrap.appendChild(dayBlock);
+  });
+  refreshConflictStates();
+}
+
+function onToggle(itemId, slot, checked){
+  if(slot.mode === 'radio'){
+    // remove other items in this slot from selections
+    slot.items.forEach(it => selections.delete(it.id));
+    if(checked) selections.add(itemId);
+  } else {
+    if(checked) selections.add(itemId); else selections.delete(itemId);
+  }
+
+  // handle cross-slot conflicts (PO Networking full day vs 10-12 / 13.30-15.30)
+  if(checked && slot.conflictsWith){
+    slot.conflictsWith.forEach(otherSlotId=>{
+      const otherSlot = findSlot(otherSlotId);
+      if(otherSlot) otherSlot.items.forEach(it=>selections.delete(it.id));
+    });
+  }
+
+  renderActivities();
+}
+
+function findSlot(slotId){
+  for(const day of SCHEDULE){
+    for(const slot of day.slots){
+      if(slot.slotId === slotId) return slot;
+    }
+  }
+  return null;
+}
+
+function refreshConflictStates(){
+  // show conflict note if this slot's conflict partner currently has a selection
+  SCHEDULE.forEach(day=>day.slots.forEach(slot=>{
+    if(!slot.conflictsWith) return;
+    const note = document.getElementById('note-'+slot.slotId);
+    const hasOwnSelection = slot.items.some(it=>selections.has(it.id));
+    if(note) note.classList.toggle('show', hasOwnSelection);
+  }));
+}
+
+// ---------- Step nav buttons ----------
+document.getElementById('btn-back-1').addEventListener('click', ()=> goStep(1));
+
+document.getElementById('btn-to-review').addEventListener('click', ()=>{
+  renderSummary('summary-list');
+  goStep(3);
+});
+
+document.getElementById('btn-back-2').addEventListener('click', ()=> goStep(2));
+
+function renderSummary(targetId){
+  const list = document.getElementById(targetId);
+  list.innerHTML = '';
+  if(selections.size === 0){
+    list.innerHTML = `<li class="empty-note">ยังไม่ได้เลือกกิจกรรมเพิ่มเติมใด ๆ</li>`;
+    return;
+  }
+  [...selections].map(id=>ITEM_INDEX[id]).sort((a,b)=>a.day.localeCompare(b.day)).forEach(item=>{
+    const li = document.createElement('li');
+    li.innerHTML = `<div class="s-day">${item.day} · ${item.time}</div>
+      <div class="s-title">${item.type} — ${item.title}</div>`;
+    list.appendChild(li);
+  });
+}
+
+document.getElementById('btn-submit').addEventListener('click', ()=>{
+  localStorage.setItem('engagement_'+currentUser.code, JSON.stringify([...selections]));
+  document.getElementById('done-name').textContent =
+    `${currentUser.name} (${currentUser.org}) · รหัสลงทะเบียน ${currentUser.code}`;
+  renderSummary('done-list');
+  goStep(4);
+});
+
+document.getElementById('btn-edit-again').addEventListener('click', ()=>{
+  renderActivities();
+  goStep(2);
+});
+
+document.getElementById('btn-print').addEventListener('click', ()=> window.print());
+
+// init
+goStep(1);
+</script>
+</body>
+</html>
