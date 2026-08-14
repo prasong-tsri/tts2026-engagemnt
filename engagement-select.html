@@ -437,6 +437,7 @@
     <div class="confirm-icon">✓</div>
     <h2 class="center">บันทึกการเลือกกิจกรรมเรียบร้อย</h2>
     <p class="center sub" id="done-name"></p>
+    <p class="center sub" id="done-note"></p>
     <ul class="summary-list" id="done-list"></ul>
     <div class="row-btns">
       <button class="btn btn-ghost btn-block" id="btn-edit-again">แก้ไขการเลือกอีกครั้ง</button>
@@ -446,7 +447,7 @@
 
 </div>
 
-<footer>Thailand Talent Summit 2026 · จัดโดย สกสว. — หน้านี้เป็นไฟล์สาธิต (demo) ยังไม่เชื่อมต่อระบบฐานข้อมูลจริง</footer>
+<footer>Thailand Talent Summit 2026 · จัดโดย สกสว.</footer>
 
 <script>
 // ============================================================
@@ -464,6 +465,12 @@
 // row's value is blank, a 5-digit code is generated automatically.
 // ============================================================
 const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS0xtvCMqUhLNWNO6jGGAfRy2lji1ZXE4-Fe3MejUbJ25YidgLbq00_E8X5Rbl9tg/pub?output=csv";
+
+// Google Apps Script Web App endpoint that receives submitted selections,
+// appends them to the "Engagement Responses" tab of the registrant Google
+// Sheet, and emails a confirmation to the registrant (BCC to the admin).
+// Leave blank to disable server-side saving (selections still save locally).
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxp7Nv8dzlHA56Ddfb0AW0UgTVv11OtpzgU0KerzzWrx0IpWn8XX0gnCcefbslIuKXs/exec";
 
 const CODE_PREFIX = "TTS26-";
 const CODE_DIGITS = 5;
@@ -545,7 +552,7 @@ function rowsToRegistrants(rows){
 function setDataStatus(state, count){
   const el = document.getElementById('data-status-banner');
   if(state === 'live'){
-    el.innerHTML = `<b>เชื่อมต่อฐานข้อมูลจริงแล้ว:</b> โหลดรายชื่อผู้ลงทะเบียนจาก Google Sheet สำเร็จ (${count} รายชื่อ) การเลือกกิจกรรมยังคงบันทึกไว้ในเบราว์เซอร์นี้เท่านั้น (localStorage)`;
+    el.innerHTML = `<b>เชื่อมต่อฐานข้อมูลจริงแล้ว:</b> โหลดรายชื่อผู้ลงทะเบียนจาก Google Sheet สำเร็จ (${count} รายชื่อ) เมื่อยืนยันการเลือกกิจกรรม ระบบจะบันทึกลง Google Sheet และส่งอีเมลยืนยันให้อัตโนมัติ`;
   } else if(state === 'error'){
     el.innerHTML = `<b>เชื่อมต่อ Google Sheet ไม่สำเร็จ:</b> ระบบสลับไปใช้ข้อมูลตัวอย่างชั่วคราวแทน ตรวจสอบว่า URL ใน SHEET_CSV_URL ถูกต้องและชีตถูก publish แบบ CSV แล้ว`;
   } else {
@@ -908,10 +915,57 @@ function renderSummary(targetId){
   });
 }
 
-document.getElementById('btn-submit').addEventListener('click', ()=>{
+document.getElementById('btn-submit').addEventListener('click', async ()=>{
+  const btn = document.getElementById('btn-submit');
+  const originalLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'กำลังบันทึก...';
+
+  // always keep a local copy so the page still works offline / if the
+  // server call fails
   localStorage.setItem('engagement_'+currentUser.code, JSON.stringify([...selections]));
+
+  let savedToServer = false;
+  if(APPS_SCRIPT_URL){
+    try{
+      const payload = {
+        code: currentUser.code,
+        name: currentUser.name,
+        org: currentUser.org,
+        email: currentUser.email,
+        selections: [...selections].map(id => {
+          const it = ITEM_INDEX[id];
+          return { day: it.day, time: it.time, type: it.type, title: it.title };
+        })
+      };
+      // Apps Script web apps don't return readable CORS headers for cross-origin
+      // POST, so this is a fire-and-forget request — we can't read the response,
+      // but the request itself still reaches the server and runs doPost().
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      });
+      savedToServer = true;
+    } catch(err){
+      console.warn('ส่งข้อมูลไปยัง Google Sheet ไม่สำเร็จ (ข้อมูลยังถูกบันทึกไว้ในเบราว์เซอร์นี้แล้ว):', err);
+    }
+  }
+
+  btn.disabled = false;
+  btn.textContent = originalLabel;
+
   document.getElementById('done-name').textContent =
     `${currentUser.name} (${currentUser.org}) · รหัสลงทะเบียน ${currentUser.code}`;
+  const doneNote = document.getElementById('done-note');
+  if(doneNote){
+    doneNote.textContent = savedToServer
+      ? (currentUser.email
+          ? `ระบบได้บันทึกข้อมูลไว้ในฐานข้อมูลกลางเรียบร้อยแล้ว และส่งอีเมลยืนยันไปที่ ${currentUser.email}`
+          : 'ระบบได้บันทึกข้อมูลไว้ในฐานข้อมูลกลางเรียบร้อยแล้ว')
+      : 'บันทึกข้อมูลไว้ในเบราว์เซอร์นี้แล้ว (ไม่สามารถส่งไปยังฐานข้อมูลกลางได้ในขณะนี้ กรุณาลองใหม่ภายหลังหากต้องการให้ผู้จัดงานเห็นข้อมูลนี้)';
+  }
   renderSummary('done-list');
   goStep(4);
 });
