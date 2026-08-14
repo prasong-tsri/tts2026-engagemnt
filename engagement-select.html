@@ -388,7 +388,7 @@
     </div>
 
     <div id="confirm-block" style="display:none;">
-      <label class="field-label" id="confirm-label">ยืนยันตัวตนอีกครั้ง — กรอกอีเมลที่ใช้ลงทะเบียน หรือ 5 ตัวท้ายของรหัสลงทะเบียน</label>
+      <label class="field-label" id="confirm-label">ยืนยันตัวตนอีกครั้ง — กรอกอีเมลที่ใช้ลงทะเบียน หรือ รหัสลงทะเบียน 5 หลัก</label>
       <input type="text" id="in-confirm" placeholder="เช่น somchai.j@example.ac.th หรือ 00001">
     </div>
 
@@ -552,10 +552,14 @@ function rowsToRegistrants(rows){
 function setDataStatus(state, count){
   const el = document.getElementById('data-status-banner');
   if(state === 'live'){
-    el.innerHTML = `<b>เชื่อมต่อฐานข้อมูลจริงแล้ว:</b> โหลดรายชื่อผู้ลงทะเบียนจาก Google Sheet สำเร็จ (${count} รายชื่อ) เมื่อยืนยันการเลือกกิจกรรม ระบบจะบันทึกลง Google Sheet และส่งอีเมลยืนยันให้อัตโนมัติ`;
+    // เชื่อมต่อสำเร็จ — ไม่ต้องแสดงข้อความแจ้งเตือนใด ๆ ให้ผู้ใช้เห็น
+    el.style.display = 'none';
+    el.innerHTML = '';
   } else if(state === 'error'){
+    el.style.display = 'block';
     el.innerHTML = `<b>เชื่อมต่อ Google Sheet ไม่สำเร็จ:</b> ระบบสลับไปใช้ข้อมูลตัวอย่างชั่วคราวแทน ตรวจสอบว่า URL ใน SHEET_CSV_URL ถูกต้องและชีตถูก publish แบบ CSV แล้ว`;
   } else {
+    el.style.display = 'block';
     el.innerHTML = `<b>โหมดสาธิต (Demo):</b> ยังไม่ได้ตั้งค่า Google Sheet (SHEET_CSV_URL ว่างอยู่) ระบบค้นหาตัวตนใช้ข้อมูลตัวอย่างสำหรับทดสอบเท่านั้น การเลือกกิจกรรมบันทึกไว้ในเบราว์เซอร์นี้เท่านั้น (localStorage)`;
   }
   document.getElementById('demo-data-block').style.display = (state === 'live') ? 'none' : 'block';
