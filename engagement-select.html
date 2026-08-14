@@ -369,11 +369,14 @@
     <div class="sub">กรุณายืนยันตัวตนด้วยข้อมูลที่ใช้ลงทะเบียนไว้ เพื่อเลือกกิจกรรม Engagement เพิ่มเติม</div>
 
     <div class="error-msg" id="err1">กรุณาเลือกชื่อจากรายการค้นหาก่อนกดยืนยันตัวตน</div>
+    <div class="error-msg" id="err2">ข้อมูลยืนยันตัวตนไม่ถูกต้อง กรุณาตรวจสอบอีเมลหรือรหัสลงทะเบียนอีกครั้ง</div>
 
-    <label class="field-label">ค้นหาชื่อ-นามสกุล, อีเมล, หน่วยงาน หรือรหัสลงทะเบียน</label>
-    <div class="search-wrap">
-      <input type="text" id="in-search" placeholder="พิมพ์บางส่วน เช่น สมชาย, มหิดล หรือ TTS26-0001" autocomplete="off">
-      <div class="search-dropdown" id="search-dropdown"></div>
+    <div id="search-block">
+      <label class="field-label">ค้นหาชื่อ-นามสกุล หรือ หน่วยงาน</label>
+      <div class="search-wrap">
+        <input type="text" id="in-search" placeholder="พิมพ์บางส่วน เช่น สมชาย หรือ มหิดล" autocomplete="off">
+        <div class="search-dropdown" id="search-dropdown"></div>
+      </div>
     </div>
 
     <div class="selected-user" id="selected-user" style="display:none;">
@@ -382,6 +385,11 @@
         <div class="su-meta" id="su-meta"></div>
       </div>
       <button class="su-clear" type="button" id="su-clear">เปลี่ยน</button>
+    </div>
+
+    <div id="confirm-block" style="display:none;">
+      <label class="field-label">ยืนยันตัวตนอีกครั้ง — กรอกอีเมลที่ใช้ลงทะเบียน หรือ 4 ตัวท้ายของรหัสลงทะเบียน</label>
+      <input type="text" id="in-confirm" placeholder="เช่น somchai.j@example.ac.th หรือ 0001">
     </div>
 
     <button class="btn btn-primary btn-block" id="btn-verify" disabled>ยืนยันตัวตน</button>
@@ -536,11 +544,11 @@ function highlight(text, q){
 function searchRegistrants(q){
   const nq = norm(q);
   if(!nq) return [];
+  // search by name/org only — email and registration code are reserved for the
+  // second-factor confirmation step, so they are intentionally not searchable/visible here
   return REGISTRANTS.filter(r =>
     norm(r.name).includes(nq) ||
-    norm(r.email).includes(nq) ||
-    norm(r.org).includes(nq) ||
-    norm(r.code).includes(nq)
+    norm(r.org).includes(nq)
   ).slice(0, 8);
 }
 
@@ -559,7 +567,7 @@ function renderDropdown(q){
   dropdown.innerHTML = results.map(r => `
     <div class="search-item" data-code="${r.code}">
       <div class="si-name">${highlight(r.name, q)}</div>
-      <div class="si-meta">${highlight(r.org, q)} · ${highlight(r.email, q)} · รหัส ${highlight(r.code, q)}</div>
+      <div class="si-meta">${highlight(r.org, q)}</div>
     </div>`).join('');
   dropdown.classList.add('show');
   dropdown.querySelectorAll('.search-item').forEach(el=>{
@@ -574,11 +582,16 @@ function selectCandidate(code){
   searchInput.value = '';
   dropdown.classList.remove('show');
   dropdown.innerHTML = '';
+  document.getElementById('search-block').style.display = 'none';
   document.getElementById('selected-user').style.display = 'flex';
   document.getElementById('su-name').textContent = r.name;
-  document.getElementById('su-meta').textContent = `${r.org} · รหัสลงทะเบียน ${r.code}`;
+  document.getElementById('su-meta').textContent = r.org;
+  document.getElementById('confirm-block').style.display = 'block';
+  document.getElementById('in-confirm').value = '';
   document.getElementById('btn-verify').disabled = false;
   document.getElementById('err1').style.display = 'none';
+  document.getElementById('err2').style.display = 'none';
+  document.getElementById('in-confirm').focus();
 }
 
 searchInput.addEventListener('input', (e)=> renderDropdown(e.target.value));
@@ -598,10 +611,26 @@ document.addEventListener('click', (e)=>{
 document.getElementById('su-clear').addEventListener('click', ()=>{
   selectedCandidate = null;
   document.getElementById('selected-user').style.display = 'none';
+  document.getElementById('confirm-block').style.display = 'none';
+  document.getElementById('in-confirm').value = '';
+  document.getElementById('search-block').style.display = 'block';
   document.getElementById('btn-verify').disabled = true;
+  document.getElementById('err1').style.display = 'none';
+  document.getElementById('err2').style.display = 'none';
   searchInput.value = '';
   searchInput.focus();
 });
+
+// second-factor check: full email match, or last-4/full registration code match
+function confirmMatches(candidate, raw){
+  const v = norm(raw);
+  if(!v) return false;
+  if(v === norm(candidate.email)) return true;
+  const codeNorm = norm(candidate.code);
+  if(v === codeNorm) return true;
+  if(v === codeNorm.slice(-4)) return true;
+  return false;
+}
 
 // ---------- Step navigation helper ----------
 function goStep(n){
@@ -623,7 +652,13 @@ document.getElementById('btn-verify').addEventListener('click', ()=>{
     document.getElementById('err1').style.display='block';
     return;
   }
+  const confirmVal = document.getElementById('in-confirm').value;
+  if(!confirmMatches(selectedCandidate, confirmVal)){
+    document.getElementById('err2').style.display='block';
+    return;
+  }
   document.getElementById('err1').style.display='none';
+  document.getElementById('err2').style.display='none';
   currentUser = selectedCandidate;
 
   // load any saved selections for this user
