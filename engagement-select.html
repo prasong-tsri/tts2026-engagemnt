@@ -353,8 +353,8 @@
 
 <div class="wrap">
 
-  <div class="demo-banner">
-    <b>โหมดสาธิต (Demo):</b> หน้านี้ยังไม่เชื่อมต่อฐานข้อมูลผู้ลงทะเบียนจริง ระบบค้นหาตัวตนใช้ข้อมูลตัวอย่างสำหรับทดสอบเท่านั้น การเลือกกิจกรรมจะถูกบันทึกไว้ในเบราว์เซอร์นี้เท่านั้น (localStorage) ยังไม่ถูกส่งเข้าระบบส่วนกลาง
+  <div class="demo-banner" id="data-status-banner">
+    <b>กำลังตรวจสอบแหล่งข้อมูล...</b>
   </div>
 
   <div class="steps">
@@ -388,21 +388,21 @@
     </div>
 
     <div id="confirm-block" style="display:none;">
-      <label class="field-label">ยืนยันตัวตนอีกครั้ง — กรอกอีเมลที่ใช้ลงทะเบียน หรือ 4 ตัวท้ายของรหัสลงทะเบียน</label>
-      <input type="text" id="in-confirm" placeholder="เช่น somchai.j@example.ac.th หรือ 0001">
+      <label class="field-label" id="confirm-label">ยืนยันตัวตนอีกครั้ง — กรอกอีเมลที่ใช้ลงทะเบียน หรือ 5 ตัวท้ายของรหัสลงทะเบียน</label>
+      <input type="text" id="in-confirm" placeholder="เช่น somchai.j@example.ac.th หรือ 00001">
     </div>
 
     <button class="btn btn-primary btn-block" id="btn-verify" disabled>ยืนยันตัวตน</button>
 
-    <details class="demo-data">
+    <details class="demo-data" id="demo-data-block">
       <summary>ข้อมูลตัวอย่างสำหรับทดสอบระบบ (Demo)</summary>
       <table>
         <tr><th>ชื่อ-นามสกุล</th><th>อีเมล</th><th>หน่วยงาน</th><th>รหัสลงทะเบียน</th></tr>
-        <tr><td>สมชาย ใจดี</td><td>somchai.j@example.ac.th</td><td>จุฬาลงกรณ์มหาวิทยาลัย</td><td>TTS26-0001</td></tr>
-        <tr><td>วิภาวี ศรีสุข</td><td>wipawee.s@nstda.or.th</td><td>สวทช.</td><td>TTS26-0002</td></tr>
-        <tr><td>ธนกร รุ่งเรือง</td><td>thanakorn.r@ku.ac.th</td><td>มหาวิทยาลัยเกษตรศาสตร์</td><td>TTS26-0003</td></tr>
-        <tr><td>ปิยะดา แสงทอง</td><td>piyada.s@mahidol.ac.th</td><td>มหาวิทยาลัยมหิดล</td><td>TTS26-0004</td></tr>
-        <tr><td>อรรถพล เจริญสุข</td><td>attapol.c@tsri.or.th</td><td>สกสว.</td><td>TTS26-0005</td></tr>
+        <tr><td>สมชาย ใจดี</td><td>somchai.j@example.ac.th</td><td>จุฬาลงกรณ์มหาวิทยาลัย</td><td>TTS26-00001</td></tr>
+        <tr><td>วิภาวี ศรีสุข</td><td>wipawee.s@nstda.or.th</td><td>สวทช.</td><td>TTS26-00002</td></tr>
+        <tr><td>ธนกร รุ่งเรือง</td><td>thanakorn.r@ku.ac.th</td><td>มหาวิทยาลัยเกษตรศาสตร์</td><td>TTS26-00003</td></tr>
+        <tr><td>ปิยะดา แสงทอง</td><td>piyada.s@mahidol.ac.th</td><td>มหาวิทยาลัยมหิดล</td><td>TTS26-00004</td></tr>
+        <tr><td>อรรถพล เจริญสุข</td><td>attapol.c@tsri.or.th</td><td>สกสว.</td><td>TTS26-00005</td></tr>
       </table>
     </details>
   </section>
@@ -449,14 +449,134 @@
 <footer>Thailand Talent Summit 2026 · จัดโดย สกสว. — หน้านี้เป็นไฟล์สาธิต (demo) ยังไม่เชื่อมต่อระบบฐานข้อมูลจริง</footer>
 
 <script>
-// ---------- Mock registrant database ----------
-const REGISTRANTS = [
-  {name:"สมชาย ใจดี", email:"somchai.j@example.ac.th", org:"จุฬาลงกรณ์มหาวิทยาลัย", code:"TTS26-0001"},
-  {name:"วิภาวี ศรีสุข", email:"wipawee.s@nstda.or.th", org:"สวทช.", code:"TTS26-0002"},
-  {name:"ธนกร รุ่งเรือง", email:"thanakorn.r@ku.ac.th", org:"มหาวิทยาลัยเกษตรศาสตร์", code:"TTS26-0003"},
-  {name:"ปิยะดา แสงทอง", email:"piyada.s@mahidol.ac.th", org:"มหาวิทยาลัยมหิดล", code:"TTS26-0004"},
-  {name:"อรรถพล เจริญสุข", email:"attapol.c@tsri.or.th", org:"สกสว.", code:"TTS26-0005"}
+// ============================================================
+// DATA SOURCE CONFIGURATION
+// Paste a published Google Sheet CSV URL below to connect the real
+// registrant list. Leave blank to keep running on the built-in demo data.
+//
+// How to get the URL (Google Sheets):
+//   1. File > Share > Publish to web
+//   2. Under "Link", choose the sheet/tab with registrant data
+//   3. Under the format dropdown choose "Comma-separated values (.csv)"
+//   4. Click Publish, copy the URL it gives you, paste it below
+// Required columns (header row, any order): ชื่อ-นามสกุล (name), อีเมล (email),
+// หน่วยงาน (org). A รหัสลงทะเบียน (code) column is optional — if missing or a
+// row's value is blank, a 5-digit code is generated automatically.
+// ============================================================
+const SHEET_CSV_URL = ""; // e.g. "https://docs.google.com/spreadsheets/d/e/2PACX-xxxx/pub?output=csv"
+
+const CODE_PREFIX = "TTS26-";
+const CODE_DIGITS = 5;
+
+// ---------- Demo fallback dataset (used until a Google Sheet is connected) ----------
+const DEMO_REGISTRANTS = [
+  {name:"สมชาย ใจดี", email:"somchai.j@example.ac.th", org:"จุฬาลงกรณ์มหาวิทยาลัย", code:"TTS26-00001"},
+  {name:"วิภาวี ศรีสุข", email:"wipawee.s@nstda.or.th", org:"สวทช.", code:"TTS26-00002"},
+  {name:"ธนกร รุ่งเรือง", email:"thanakorn.r@ku.ac.th", org:"มหาวิทยาลัยเกษตรศาสตร์", code:"TTS26-00003"},
+  {name:"ปิยะดา แสงทอง", email:"piyada.s@mahidol.ac.th", org:"มหาวิทยาลัยมหิดล", code:"TTS26-00004"},
+  {name:"อรรถพล เจริญสุข", email:"attapol.c@tsri.or.th", org:"สกสว.", code:"TTS26-00005"}
 ];
+
+let REGISTRANTS = DEMO_REGISTRANTS;
+let usingRealData = false;
+
+// ---------- Minimal CSV parser (handles quoted fields, commas, escaped quotes) ----------
+function parseCSV(text){
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for(let i=0; i<text.length; i++){
+    const c = text[i], next = text[i+1];
+    if(inQuotes){
+      if(c === '"' && next === '"'){ field += '"'; i++; }
+      else if(c === '"'){ inQuotes = false; }
+      else field += c;
+    } else {
+      if(c === '"') inQuotes = true;
+      else if(c === ','){ row.push(field); field = ''; }
+      else if(c === '\r'){ /* skip */ }
+      else if(c === '\n'){ row.push(field); rows.push(row); row = []; field = ''; }
+      else field += c;
+    }
+  }
+  if(field.length || row.length){ row.push(field); rows.push(row); }
+  return rows.filter(r => r.some(v => v.trim() !== ''));
+}
+
+function findCol(headers, candidates){
+  const hs = headers.map(h => h.trim().toLowerCase());
+  for(const cand of candidates){
+    const idx = hs.indexOf(cand.toLowerCase());
+    if(idx !== -1) return idx;
+  }
+  for(let i=0;i<hs.length;i++){
+    for(const cand of candidates){
+      if(hs[i].includes(cand.toLowerCase())) return i;
+    }
+  }
+  return -1;
+}
+
+function rowsToRegistrants(rows){
+  if(rows.length < 2) return [];
+  const headers = rows[0];
+  const nameIdx = findCol(headers, ['ชื่อ-นามสกุล','ชื่อนามสกุล','ชื่อ','name','full name']);
+  const emailIdx = findCol(headers, ['อีเมล','email','e-mail']);
+  const orgIdx = findCol(headers, ['หน่วยงาน','สังกัด','organization','org']);
+  const codeIdx = findCol(headers, ['รหัสลงทะเบียน','รหัส','registration code','code','id']);
+
+  let autoSeq = 1;
+  const out = [];
+  for(let i=1; i<rows.length; i++){
+    const r = rows[i];
+    const name = nameIdx >= 0 ? (r[nameIdx] || '').trim() : '';
+    if(!name) continue;
+    const email = emailIdx >= 0 ? (r[emailIdx] || '').trim() : '';
+    const org = orgIdx >= 0 ? (r[orgIdx] || '').trim() : '';
+    let code = codeIdx >= 0 ? (r[codeIdx] || '').trim() : '';
+    if(!code){
+      code = CODE_PREFIX + String(autoSeq).padStart(CODE_DIGITS, '0');
+      autoSeq++;
+    }
+    out.push({name, email, org, code});
+  }
+  return out;
+}
+
+function setDataStatus(state, count){
+  const el = document.getElementById('data-status-banner');
+  if(state === 'live'){
+    el.innerHTML = `<b>เชื่อมต่อฐานข้อมูลจริงแล้ว:</b> โหลดรายชื่อผู้ลงทะเบียนจาก Google Sheet สำเร็จ (${count} รายชื่อ) การเลือกกิจกรรมยังคงบันทึกไว้ในเบราว์เซอร์นี้เท่านั้น (localStorage)`;
+  } else if(state === 'error'){
+    el.innerHTML = `<b>เชื่อมต่อ Google Sheet ไม่สำเร็จ:</b> ระบบสลับไปใช้ข้อมูลตัวอย่างชั่วคราวแทน ตรวจสอบว่า URL ใน SHEET_CSV_URL ถูกต้องและชีตถูก publish แบบ CSV แล้ว`;
+  } else {
+    el.innerHTML = `<b>โหมดสาธิต (Demo):</b> ยังไม่ได้ตั้งค่า Google Sheet (SHEET_CSV_URL ว่างอยู่) ระบบค้นหาตัวตนใช้ข้อมูลตัวอย่างสำหรับทดสอบเท่านั้น การเลือกกิจกรรมบันทึกไว้ในเบราว์เซอร์นี้เท่านั้น (localStorage)`;
+  }
+  document.getElementById('demo-data-block').style.display = (state === 'live') ? 'none' : 'block';
+}
+
+async function loadRegistrants(){
+  if(!SHEET_CSV_URL){
+    REGISTRANTS = DEMO_REGISTRANTS;
+    usingRealData = false;
+    setDataStatus('demo');
+    return;
+  }
+  try{
+    const res = await fetch(SHEET_CSV_URL, { cache: 'no-store' });
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    const parsed = rowsToRegistrants(parseCSV(text));
+    if(parsed.length === 0) throw new Error('no rows parsed from sheet');
+    REGISTRANTS = parsed;
+    usingRealData = true;
+    setDataStatus('live', parsed.length);
+  } catch(err){
+    console.warn('Failed to load Google Sheet, falling back to demo data:', err);
+    REGISTRANTS = DEMO_REGISTRANTS;
+    usingRealData = false;
+    setDataStatus('error');
+  }
+}
 
 // ---------- Activity schedule ----------
 // slot = exact concurrent time block; fullDayConflict = slots it overlaps with (for PO Networking spanning the whole day)
@@ -621,14 +741,15 @@ document.getElementById('su-clear').addEventListener('click', ()=>{
   searchInput.focus();
 });
 
-// second-factor check: full email match, or last-4/full registration code match
+// second-factor check: full email match, or last-N-digit/full registration code match
+// (N = CODE_DIGITS, falls back gracefully if a real code turns out shorter than that)
 function confirmMatches(candidate, raw){
   const v = norm(raw);
   if(!v) return false;
   if(v === norm(candidate.email)) return true;
   const codeNorm = norm(candidate.code);
   if(v === codeNorm) return true;
-  if(v === codeNorm.slice(-4)) return true;
+  if(codeNorm.length >= CODE_DIGITS && v === codeNorm.slice(-CODE_DIGITS)) return true;
   return false;
 }
 
@@ -804,6 +925,12 @@ document.getElementById('btn-print').addEventListener('click', ()=> window.print
 
 // init
 goStep(1);
+searchInput.disabled = true;
+searchInput.placeholder = 'กำลังโหลดข้อมูลผู้ลงทะเบียน...';
+loadRegistrants().finally(()=>{
+  searchInput.disabled = false;
+  searchInput.placeholder = 'พิมพ์บางส่วน เช่น สมชาย หรือ มหิดล';
+});
 </script>
 </body>
 </html>
